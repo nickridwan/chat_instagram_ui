@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:music_apps/theme.dart';
 import 'package:music_apps/views/screens/collection.dart';
 import 'package:music_apps/views/screens/home_page.dart';
 
@@ -13,7 +14,7 @@ class MusicApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(),
+      theme: ThemeData(scaffoldBackgroundColor: AppColor.kBlackColor),
       initialRoute: '/',
       routes: {
         '/': (context) => const HomePage(),
