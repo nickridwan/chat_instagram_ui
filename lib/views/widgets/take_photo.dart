@@ -17,16 +17,15 @@ class _TakePictureState extends State<TakePicture> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.yellow.shade800,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             selectedImagePath == ''
-                ? Image.asset(
-                    'assets/images/image_placeholder.png',
-                    height: 200,
+                ? Image.network(
+                    "https://i.ibb.co/S32HNjD/no-image.jpg",
                     width: 200,
+                    height: 200,
                     fit: BoxFit.fill,
                   )
                 : Image.file(
@@ -109,10 +108,11 @@ class _TakePictureState extends State<TakePicture> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
                                   children: [
-                                    Image.asset(
-                                      'assets/images/gallery.png',
-                                      height: 60,
-                                      width: 60,
+                                    Image.network(
+                                      "https://i.ibb.co/S32HNjD/no-image.jpg",
+                                      width: 64.0,
+                                      height: 64.0,
+                                      fit: BoxFit.cover,
                                     ),
                                     Text(
                                       'Gallery',
@@ -148,10 +148,11 @@ class _TakePictureState extends State<TakePicture> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
                                   children: [
-                                    Image.asset(
-                                      'assets/images/camera.png',
-                                      height: 60,
-                                      width: 60,
+                                    Image.network(
+                                      "https://i.ibb.co/S32HNjD/no-image.jpg",
+                                      width: 64.0,
+                                      height: 64.0,
+                                      fit: BoxFit.cover,
                                     ),
                                     Text(
                                       'Camera',

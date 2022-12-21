@@ -2,24 +2,29 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:music_apps/models/message.dart';
 import 'package:music_apps/views/screens/chats.dart';
 import 'package:music_apps/views/widgets/shimmer.dart';
 import '../../models/models.dart';
 import '../../theme.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  DateTime? backButtonOnPressedTime;
   List<UserModel> users = [];
+  List<Message> message = [];
   List<UserModel> filterUser = [];
+
   final searchCtr = TextEditingController();
-  File? imageFiles;
+  String selectedImagePath = '';
 
   bool isField = false;
   bool isSearch = false;
@@ -50,11 +55,35 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    log('initState()');
+    log('HomePage: initState()');
     getUser();
   }
 
-  message() {
+  @override
+  void dispose() {
+    log("HomePage: dispose()");
+    super.dispose();
+  }
+
+  @override
+  void deactivate() {
+    log("HomePage: deactivate()");
+    super.deactivate();
+  }
+
+  @override
+  void didChangeDependencies() {
+    log("HomePage: didChangeDepedencies()");
+    super.didChangeDependencies();
+  }
+
+  @override
+  void didUpdateWidget(covariant HomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    log("HomePage: didUpdateWidget()");
+  }
+
+  option() {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 20),
       child: Row(
@@ -182,107 +211,182 @@ class _HomePageState extends State<HomePage> {
       scrollDirection: Axis.horizontal,
       controller: ScrollController(),
       child: Row(
-        children: users
-            .map(
-              (e) => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: Column(
-                  children: [
-                    !isVisible
-                        ? CircleAvatar(
-                            backgroundImage: NetworkImage(e.avatar),
-                            radius: 40.0,
-                          )
-                        : circleShimmer(context),
-                    const SizedBox(
-                      height: 7,
-                    ),
-                    Text(
-                      e.username,
-                      style: Style.whiteGreyTextStyle.copyWith(fontSize: 10),
-                    ),
-                  ],
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: Column(
+              children: [
+                !isVisible
+                    ? const CircleAvatar(
+                        backgroundImage: AssetImage('assets/music.jpg'),
+                        radius: 40.0,
+                      )
+                    : circleShimmer(context),
+                const SizedBox(
+                  height: 7,
                 ),
-              ),
-            )
-            .toList(),
+                Text(
+                  'anda',
+                  style: Style.whiteGreyTextStyle
+                      .copyWith(fontSize: 12, fontWeight: Weigth.bold),
+                ),
+              ],
+            ),
+          ),
+          Row(
+            children: users
+                .map(
+                  (e) => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: Column(
+                      children: [
+                        !isVisible
+                            ? CircleAvatar(
+                                backgroundImage: NetworkImage(e.avatar),
+                                radius: 40.0,
+                              )
+                            : circleShimmer(context),
+                        const SizedBox(
+                          height: 7,
+                        ),
+                        Text(
+                          e.username,
+                          style: Style.whiteGreyTextStyle
+                              .copyWith(fontSize: 12, fontWeight: Weigth.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
       ),
     );
   }
 
   Widget chatHistory() {
-    return Column(
-      children: (!isSearch ? users : filterUser)
-          .map((e) => GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => CollectionPage(chat: e)));
-                  log('test.cok');
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: !isVisible
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Expanded(
+      child: ListView.builder(
+        itemCount: !isSearch ? users.length : filterUser.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ChatPage(
+                          user: !isSearch ? users[index] : filterUser[index])));
+              log('chat');
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: !isVisible
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
                           children: [
-                            Row(
+                            CircleAvatar(
+                              backgroundImage: NetworkImage(!isSearch
+                                  ? users[index].avatar
+                                  : filterUser[index].avatar),
+                              radius: 30,
+                            ),
+                            const SizedBox(
+                              width: 13,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                CircleAvatar(
-                                  backgroundImage: NetworkImage(e.avatar),
-                                  radius: 30,
+                                Text(
+                                  !isSearch
+                                      ? users[index].username
+                                      : filterUser[index].username,
+                                  style: Style.whiteGreyTextStyle.copyWith(
+                                    fontSize: 13,
+                                    fontWeight: Weigth.semibold,
+                                  ),
                                 ),
-                                const SizedBox(
-                                  width: 13,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      e.username,
-                                      style: Style.whiteGreyTextStyle.copyWith(
-                                        fontSize: 13,
-                                        fontWeight: Weigth.semibold,
-                                      ),
-                                    ),
-                                    Text(
-                                      "Balasan untuk cerita anda .",
-                                      style: Style.whiteGreyTextStyle.copyWith(
-                                        fontSize: 12,
-                                        fontWeight: Weigth.regular,
-                                      ),
-                                    ),
-                                  ],
+                                Text(
+                                  'membalas cerita anda',
+                                  // message[index].msg ?? '-',
+                                  style: Style.whiteGreyTextStyle.copyWith(
+                                    fontSize: 12,
+                                    fontWeight: Weigth.regular,
+                                  ),
                                 ),
                               ],
                             ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.pushNamed(context, '/camera');
-                              },
-                              icon: Icon(
-                                CupertinoIcons.camera,
-                                color: AppColor.kWhiteColor,
-                                size: 24.0,
-                              ),
-                            ),
                           ],
-                        )
-                      : shimmerListView(context),
-                ),
-              ))
-          .toList(),
+                        ),
+                        IconButton(
+                          onPressed: () async {
+                            selectedImagePath = await selectImageFromCamera();
+                            log('Image_Path:-');
+                            log(selectedImagePath);
+
+                            if (selectedImagePath != '') {
+                              // ignore: use_build_context_synchronously
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Success",
+                                      style: Style.greenTextStyle),
+                                ),
+                              );
+                              setState(() {});
+                            } else {
+                              // ignore: use_build_context_synchronously
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content: Text(
+                                  "No Image Captured !",
+                                  style: Style.whiteTextStyle,
+                                ),
+                              ));
+                            }
+                          },
+                          icon: Icon(
+                            CupertinoIcons.camera,
+                            color: AppColor.kWhiteColor,
+                            size: 24.0,
+                          ),
+                        ),
+                      ],
+                    )
+                  : shimmerListView(context),
+            ),
+          );
+        },
+      ),
     );
+  }
+
+  Future<bool> onWillPop() async {
+    DateTime currentTime = DateTime.now();
+    bool backButton = backButtonOnPressedTime == null ||
+        currentTime.difference(backButtonOnPressedTime!) > Duration(seconds: 3);
+    if (backButton) {
+      backButtonOnPressedTime = currentTime;
+      Fluttertoast.showToast(
+        msg: 'tap to close',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: AppColor.kBlackColor.withOpacity(.5),
+        textColor: AppColor.kWhiteColor,
+        fontSize: 16.0,
+      );
+      return false;
+    }
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
-    log('Visible $isVisible');
     return Scaffold(
-      body: SingleChildScrollView(
-        controller: ScrollController(),
+      body: WillPopScope(
+        onWillPop: () => onWillPop(),
         child: Container(
           margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
           child: Column(
@@ -292,12 +396,33 @@ class _HomePageState extends State<HomePage> {
                 height: 30,
               ),
               circleStory(),
-              message(),
+              option(),
               chatHistory(),
             ],
           ),
         ),
       ),
     );
+  }
+
+  selectImageFromGallery() async {
+    File? file = await ImagePicker()
+        .getImage(source: ImageSource.gallery, imageQuality: 10) as File;
+    if (file != null) {
+      return file.path;
+    } else {
+      return '';
+    }
+  }
+
+  //
+  selectImageFromCamera() async {
+    File? file = await ImagePicker()
+        .getImage(source: ImageSource.camera, imageQuality: 10) as File;
+    if (file != null) {
+      return file.path;
+    } else {
+      return '';
+    }
   }
 }

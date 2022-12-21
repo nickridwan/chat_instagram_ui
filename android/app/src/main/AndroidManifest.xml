@@ -2,7 +2,7 @@
     package="com.example.music_apps">
     <uses-feature android:name="android.hardware.camera" android:required="false" />
    <application
-        android:label="music_apps"
+        android:label="ui_instagram"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

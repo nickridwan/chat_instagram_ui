@@ -1,24 +1,51 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:music_apps/models/message.dart';
 import 'package:music_apps/models/models.dart';
 
 import '../../theme.dart';
 
-class CollectionPage extends StatefulWidget {
-  UserModel chat;
-  CollectionPage({super.key, required this.chat});
+class ChatPage extends StatefulWidget {
+  UserModel user;
+  ChatPage({super.key, required this.user});
 
   @override
-  State<CollectionPage> createState() => _CollectionPageState();
+  State<ChatPage> createState() => _ChatPageState();
 }
 
-class _CollectionPageState extends State<CollectionPage> {
+class _ChatPageState extends State<ChatPage> {
   final chatController = TextEditingController();
-  bool _pinned = true;
-  bool _snap = false;
-  bool _floating = false;
+  bool isMessage = false;
+  String selectedImagePath = '';
+  bool isAccount = false;
+
+  @override
+  void dispose() {
+    log("Chat: dispose()");
+    super.dispose();
+  }
+
+  @override
+  void deactivate() {
+    log("Chat: deactivate()");
+    super.deactivate();
+  }
+
+  @override
+  void didChangeDependencies() {
+    log("Chat: didChangeDepedencies()");
+    super.didChangeDependencies();
+  }
+
+  @override
+  void didUpdateWidget(covariant ChatPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    log("Chat: didUpdateWidget()");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +65,7 @@ class _CollectionPageState extends State<CollectionPage> {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundImage: NetworkImage(widget.chat.avatar),
+              backgroundImage: NetworkImage(widget.user.avatar),
             ),
             const SizedBox(
               width: 15,
@@ -47,7 +74,7 @@ class _CollectionPageState extends State<CollectionPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.chat.username,
+                  widget.user.username,
                   style: Style.whiteTextStyle
                       .copyWith(fontSize: 15, fontWeight: Weigth.semibold),
                 ),
@@ -78,20 +105,21 @@ class _CollectionPageState extends State<CollectionPage> {
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
+        height: MediaQuery.of(context).size.height / 1.1,
         margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 CircleAvatar(
-                  backgroundImage: NetworkImage(widget.chat.avatar),
+                  backgroundImage: NetworkImage(widget.user.avatar),
                   radius: 55.0,
                 ),
                 Text(
-                  widget.chat.username,
+                  widget.user.username,
                   style: Style.whiteTextStyle
                       .copyWith(fontWeight: Weigth.bold, fontSize: 16),
                 ),
@@ -126,16 +154,36 @@ class _CollectionPageState extends State<CollectionPage> {
               ],
             ),
             Expanded(
-              child: Container(
-                color: Colors.transparent,
-                child: ListView.builder(
-                    itemCount: 100,
-                    itemBuilder: (context, index) {
-                      return Text(
-                        "",
-                        style: Style.whiteTextStyle.copyWith(fontSize: 20),
-                      );
-                    }),
+              child: ListView.builder(
+                itemCount: message.length,
+                itemBuilder: (context, index) {
+                  log("type: ${message[index].type}");
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 14),
+                    child: Align(
+                      alignment: (message[index].type != 1
+                          ? Alignment.topLeft
+                          : Alignment.topRight),
+                      child: (message[index].id == widget.user.id)
+                          ? Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: (message[index].type != 1
+                                    ? AppColor.kGreyColor.withOpacity(.5)
+                                    : AppColor.kBlueColor),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 15),
+                              child: Text(
+                                message[index].msg,
+                                style: Style.whiteTextStyle,
+                              ),
+                            )
+                          : Container(),
+                    ),
+                  );
+                },
               ),
             ),
             Container(
@@ -146,8 +194,9 @@ class _CollectionPageState extends State<CollectionPage> {
                 shape: BoxShape.rectangle,
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 7),
-                child: TextFormField(
+                padding: const EdgeInsets.symmetric(horizontal: 7),
+                child: TextField(
+                  textAlignVertical: TextAlignVertical.center,
                   style: Style.whiteTextStyle
                       .copyWith(fontWeight: Weigth.medium, fontSize: 15),
                   keyboardType: TextInputType.name,
@@ -159,47 +208,81 @@ class _CollectionPageState extends State<CollectionPage> {
                       borderRadius: BorderRadius.circular(10),
                       borderSide: BorderSide.none,
                     ),
-                    hintText: 'Pesan...',
-                    suffixIcon: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            CupertinoIcons.mic,
-                            size: 24.0,
-                            color: AppColor.kWhiteColor,
+                    hintText: ' Pesan...',
+                    suffixIcon: isMessage
+                        ? TextButton(
+                            onPressed: () {
+                              message.add(
+                                Message(
+                                  id: widget.user.id,
+                                  msg: chatController.text,
+                                  type: 1,
+                                  date: DateTime.now(),
+                                ),
+                              );
+                              chatController.clear();
+                              setState(() {});
+                            },
+                            child: Text(
+                              "Send",
+                              style: Style.blueTextStyle.copyWith(
+                                fontWeight: Weigth.semibold,
+                              ),
+                            ),
+                          )
+                        : IconButton(
+                            onPressed: () async {
+                              selectedImagePath =
+                                  await selectImageFromGallery();
+                              log('Image_Path:-');
+                              log(selectedImagePath);
+                              if (selectedImagePath != '') {
+                                Navigator.pop(context);
+                                setState(() {});
+                              } else {
+                                log("No Image Capture");
+                              }
+                              setState(() {});
+                            },
+                            icon: Icon(
+                              CupertinoIcons.photo,
+                              size: 24.0,
+                              color: AppColor.kWhiteColor,
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            CupertinoIcons.photo,
-                            size: 24.0,
-                            color: AppColor.kWhiteColor,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            CupertinoIcons.rectangle_paperclip,
-                            size: 24.0,
-                            color: AppColor.kWhiteColor,
-                          ),
-                        ),
-                      ],
+                    prefixIcon: IconButton(
+                      onPressed: () async {
+                        selectedImagePath = await selectImageFromCamera();
+                        log('Image_Path:-');
+                        log(selectedImagePath);
+
+                        if (selectedImagePath != '') {
+                          Navigator.pop(context);
+                          setState(() {});
+                        } else {
+                          log("No Image Capture");
+                        }
+                        setState(() {});
+                      },
+                      icon: Icon(
+                        CupertinoIcons.camera_circle_fill,
+                        color: AppColor.kBlueColor,
+                        size: 45,
+                      ),
                     ),
-                    prefixIcon: Icon(
-                      CupertinoIcons.camera_circle_fill,
-                      color: AppColor.kBlueColor,
-                      size: 45,
-                    ),
+                    prefixIconConstraints:
+                        BoxConstraints.expand(width: 55, height: 60),
                     hintStyle: Style.whiteGreyTextStyle
                         .copyWith(fontWeight: Weigth.medium, fontSize: 15),
                   ),
                   onChanged: (value) {
-                    log(chatController.toString());
+                    setState(() {
+                      if (chatController.text.isNotEmpty) {
+                        isMessage = true;
+                      } else {
+                        isMessage = false;
+                      }
+                    });
                   },
                 ),
               ),
@@ -208,5 +291,26 @@ class _CollectionPageState extends State<CollectionPage> {
         ),
       ),
     );
+  }
+
+  selectImageFromGallery() async {
+    File? file = await ImagePicker()
+        .getImage(source: ImageSource.gallery, imageQuality: 10) as File;
+    if (file != null) {
+      return file.path;
+    } else {
+      return '';
+    }
+  }
+
+  //
+  selectImageFromCamera() async {
+    File? file = await ImagePicker()
+        .getImage(source: ImageSource.camera, imageQuality: 10) as File;
+    if (file != null) {
+      return file.path;
+    } else {
+      return '';
+    }
   }
 }

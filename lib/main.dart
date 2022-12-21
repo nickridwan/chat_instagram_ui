@@ -18,7 +18,7 @@ class MusicApp extends StatelessWidget {
       theme: ThemeData(scaffoldBackgroundColor: AppColor.kBlackColor),
       initialRoute: '/',
       routes: {
-        '/': (context) => const HomePage(),
+        '/': (context) => HomePage(),
         '/camera': (context) => const CameraAccess(),
       },
     );
