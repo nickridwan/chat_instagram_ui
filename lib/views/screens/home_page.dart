@@ -1,9 +1,10 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:music_apps/views/screens/chats.dart';
 import 'package:music_apps/views/widgets/shimmer.dart';
-import 'package:music_apps/views/widgets/textfield.dart';
-import 'package:shimmer/shimmer.dart';
 import '../../models/models.dart';
 import '../../theme.dart';
 
@@ -18,6 +19,9 @@ class _HomePageState extends State<HomePage> {
   List<UserModel> users = [];
   List<UserModel> filterUser = [];
   final searchCtr = TextEditingController();
+  File? imageFiles;
+
+  bool isField = false;
   bool isSearch = false;
   bool isVisible = false;
 
@@ -32,9 +36,13 @@ class _HomePageState extends State<HomePage> {
           users.add(value[i]);
         }
       });
-      setState(() {
-        isVisible = false;
+
+      Future.delayed(const Duration(milliseconds: 300), () {
+        setState(() {
+          isVisible = false;
+        });
       });
+
       return users;
     });
   }
@@ -83,21 +91,16 @@ class _HomePageState extends State<HomePage> {
               children: [
                 IconButton(
                   icon: Icon(
-                    !isSearch ? CupertinoIcons.xmark : CupertinoIcons.search,
+                    isField ? CupertinoIcons.xmark : CupertinoIcons.search,
                     size: 30,
                     color: AppColor.kWhiteGreyColor,
                   ),
                   onPressed: () {
                     setState(() {
-                      isSearch = !isSearch;
-                      filterUser = users
-                          .where(
-                            (element) =>
-                                element.username.toLowerCase().contains(
-                                      searchCtr.text.toLowerCase(),
-                                    ),
-                          )
-                          .toList();
+                      isField = !isField;
+                      if (isSearch == true || isField == false) {
+                        searchCtr.clear();
+                      }
                     });
                   },
                 ),
@@ -105,8 +108,72 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        !isSearch ? Container() : buildFormField(searchCtr, "Cari..."),
+        !isField ? Container() : buildFormField(),
       ],
+    );
+  }
+
+  Widget buildFormField() {
+    return SizedBox(
+      height: 50,
+      child: TextFormField(
+        style: Style.whiteGreyTextStyle
+            .copyWith(fontWeight: Weigth.medium, fontSize: 15),
+        keyboardType: TextInputType.name,
+        controller: searchCtr,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: AppColor.kGreyColor.withOpacity(.3),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          hintText: "Cari...",
+          suffixIcon: IconButton(
+            onPressed: () {
+              setState(() {
+                searchCtr.clear();
+                isSearch = false;
+              });
+            },
+            icon: Icon(
+              CupertinoIcons.xmark_circle,
+              size: 24.0,
+              color: AppColor.kRedColor,
+            ),
+          ),
+          prefixIcon: Icon(
+            CupertinoIcons.search,
+            color: AppColor.kWhiteColor,
+            size: 20,
+          ),
+          hintStyle: Style.whiteGreyTextStyle
+              .copyWith(fontWeight: Weigth.medium, fontSize: 15),
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+        ),
+        onChanged: (value) {
+          setState(() {
+            isVisible = true;
+          });
+          isSearch = true;
+          setState(
+            () {
+              filterUser = users
+                  .where(
+                    (element) => element.username.toLowerCase().contains(
+                          searchCtr.text.toLowerCase(),
+                        ),
+                  )
+                  .toList();
+            },
+          );
+          Future.delayed(const Duration(milliseconds: 300), () {
+            setState(() {
+              isVisible = false;
+            });
+          });
+        },
+      ),
     );
   }
 
@@ -144,130 +211,75 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget chatHistory() {
-    return isSearch
-        ? Column(
-            children: users
-                .map((e) => Container(
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      child: !isVisible
-                          ? InkWell(
-                              onTap: () {},
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      CircleAvatar(
-                                        backgroundImage: NetworkImage(e.avatar),
-                                        radius: 30,
+    return Column(
+      children: (!isSearch ? users : filterUser)
+          .map((e) => GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CollectionPage(chat: e)));
+                  log('test.cok');
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: !isVisible
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  backgroundImage: NetworkImage(e.avatar),
+                                  radius: 30,
+                                ),
+                                const SizedBox(
+                                  width: 13,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      e.username,
+                                      style: Style.whiteGreyTextStyle.copyWith(
+                                        fontSize: 13,
+                                        fontWeight: Weigth.semibold,
                                       ),
-                                      const SizedBox(
-                                        width: 13,
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            e.username,
-                                            style: Style.whiteGreyTextStyle
-                                                .copyWith(
-                                              fontSize: 13,
-                                              fontWeight: Weigth.semibold,
-                                            ),
-                                          ),
-                                          Text(
-                                            "Balasan untuk cerita anda .",
-                                            style: Style.whiteGreyTextStyle
-                                                .copyWith(
-                                              fontSize: 12,
-                                              fontWeight: Weigth.regular,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      CupertinoIcons.camera,
-                                      color: AppColor.kWhiteColor,
-                                      size: 24.0,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : shimmerListView(context),
-                    ))
-                .toList(),
-          )
-        : Column(
-            children: filterUser
-                .map((e) => Container(
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      child: !isVisible
-                          ? InkWell(
-                              onTap: () {},
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      CircleAvatar(
-                                        backgroundImage: NetworkImage(e.avatar),
-                                        radius: 30,
+                                    Text(
+                                      "Balasan untuk cerita anda .",
+                                      style: Style.whiteGreyTextStyle.copyWith(
+                                        fontSize: 12,
+                                        fontWeight: Weigth.regular,
                                       ),
-                                      const SizedBox(
-                                        width: 13,
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            e.username,
-                                            style: Style.whiteGreyTextStyle
-                                                .copyWith(
-                                              fontSize: 13,
-                                              fontWeight: Weigth.semibold,
-                                            ),
-                                          ),
-                                          Text(
-                                            "Balasan untuk cerita anda .",
-                                            style: Style.whiteGreyTextStyle
-                                                .copyWith(
-                                              fontSize: 12,
-                                              fontWeight: Weigth.regular,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      CupertinoIcons.camera,
-                                      color: AppColor.kWhiteColor,
-                                      size: 24.0,
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
+                              ],
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/camera');
+                              },
+                              icon: Icon(
+                                CupertinoIcons.camera,
+                                color: AppColor.kWhiteColor,
+                                size: 24.0,
                               ),
-                            )
-                          : shimmerListView(context),
-                    ))
-                .toList(),
-          );
+                            ),
+                          ],
+                        )
+                      : shimmerListView(context),
+                ),
+              ))
+          .toList(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    log('loading $isVisible');
+    log('Visible $isVisible');
     return Scaffold(
       body: SingleChildScrollView(
         controller: ScrollController(),

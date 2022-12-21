@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:music_apps/theme.dart';
-import 'package:music_apps/views/screens/collection.dart';
+import 'package:music_apps/views/widgets/camera.dart';
 import 'package:music_apps/views/screens/home_page.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MusicApp());
 }
 
@@ -18,7 +19,7 @@ class MusicApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const HomePage(),
-        '/collection': (context) => const CollectionPage(),
+        '/camera': (context) => const CameraAccess(),
       },
     );
   }
