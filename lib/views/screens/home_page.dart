@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:music_apps/models/message.dart';
 import 'package:music_apps/views/screens/chats.dart';
+import 'package:music_apps/views/widgets/page_transition.dart';
 import 'package:music_apps/views/widgets/shimmer.dart';
 import '../../models/models.dart';
 import '../../theme.dart';
@@ -274,10 +275,13 @@ class _HomePageState extends State<HomePage> {
             behavior: HitTestBehavior.translucent,
             onTap: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ChatPage(
-                          user: !isSearch ? users[index] : filterUser[index])));
+                context,
+                createRoute(
+                  ChatPage(
+                    user: !isSearch ? users[index] : filterUser[index],
+                  ),
+                ),
+              );
               log('chat');
             },
             child: Container(
@@ -326,7 +330,6 @@ class _HomePageState extends State<HomePage> {
                             selectedImagePath = await selectImageFromCamera();
                             log('Image_Path:-');
                             log(selectedImagePath);
-
                             if (selectedImagePath != '') {
                               // ignore: use_build_context_synchronously
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -338,13 +341,14 @@ class _HomePageState extends State<HomePage> {
                               setState(() {});
                             } else {
                               // ignore: use_build_context_synchronously
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: Text(
-                                  "No Image Captured !",
-                                  style: Style.whiteTextStyle,
-                                ),
-                              ));
+                              // ScaffoldMessenger.of(context)
+                              //     .showSnackBar(SnackBar(
+                              //   content: Text(
+                              //     "No Image Captured !",
+                              //     style: Style.whiteTextStyle,
+                              //   ),
+                              // ));
+                              log("No Image Captured");
                             }
                           },
                           icon: Icon(
