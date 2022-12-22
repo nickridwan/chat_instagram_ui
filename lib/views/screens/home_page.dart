@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:music_apps/models/message.dart';
 import 'package:music_apps/views/screens/chats.dart';
@@ -373,13 +372,13 @@ class _HomePageState extends State<HomePage> {
         currentTime.difference(backButtonOnPressedTime!) > Duration(seconds: 3);
     if (backButton) {
       backButtonOnPressedTime = currentTime;
-      Fluttertoast.showToast(
-        msg: 'tap to close',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: AppColor.kBlackColor.withOpacity(.5),
-        textColor: AppColor.kWhiteColor,
-        fontSize: 16.0,
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Tap again",
+            style: Style.whiteTextStyle,
+          ),
+        ),
       );
       return false;
     }

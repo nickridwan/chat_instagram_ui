@@ -23,7 +23,7 @@ class UserModel {
 
   static Future<List<UserModel>> getDataUser() async {
     final response =
-        await http.get(Uri.parse('https://reqres.in/api/users?page=2'));
+        await http.get(Uri.parse('https://reqres.in/api/usersfire?page=2'));
     final jsonObject = jsonDecode(response.body);
     List<dynamic> list = (jsonObject as Map<String, dynamic>)['data'];
     List<UserModel> users = [];

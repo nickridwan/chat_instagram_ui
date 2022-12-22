@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "185498054079",
+    "project_id": "db-insta-59421",
+    "storage_bucket": "db-insta-59421.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:185498054079:android:8e42fe1c55c2ec0bda450a",
+        "android_client_info": {
+          "package_name": "com.example.music_apps"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "185498054079-5ngmvutfhd38lu5ftegsltsttde4bs6g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEpOoeFbcY0bZp_MNmIz39vGpsdABEfp0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "185498054079-5ngmvutfhd38lu5ftegsltsttde4bs6g.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "185498054079-u4lukousj7kpj9raajii10bug7jn93mn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.musicApps"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
