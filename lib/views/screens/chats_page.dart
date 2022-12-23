@@ -182,7 +182,7 @@ class _ChatPageState extends State<ChatPage> {
                           vertical: 10, horizontal: 15),
                       child: selectedImagePath != null
                           ? Image.file(
-                              File(chatController.text),
+                              File(message[index].msg),
                             )
                           : Text(
                               message[index].msg,
@@ -221,7 +221,7 @@ class _ChatPageState extends State<ChatPage> {
               borderSide: BorderSide.none,
             ),
             hintText: ' Pesan...',
-            suffixIcon: isMessage
+            suffixIcon: chatController.text.isNotEmpty || isMessage
                 ? TextButton(
                     onPressed: () {
                       message.add(
@@ -283,7 +283,8 @@ class _ChatPageState extends State<ChatPage> {
                 size: 45,
               ),
             ),
-            prefixIconConstraints: BoxConstraints.expand(width: 55, height: 60),
+            prefixIconConstraints:
+                const BoxConstraints.expand(width: 55, height: 60),
             hintStyle: Style.whiteGreyTextStyle
                 .copyWith(fontWeight: Weigth.medium, fontSize: 15),
           ),

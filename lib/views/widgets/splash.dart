@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
 import '../../theme.dart';
-import '../screens/login_page.dart';
 
 class Splash extends StatefulWidget {
   @override
