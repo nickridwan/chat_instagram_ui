@@ -121,14 +121,7 @@ class _CameraAccessState extends State<CameraAccess> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const TakePicture(),
-                        ),
-                      );
-                    },
+                    onPressed: () {},
                     icon: Icon(
                       CupertinoIcons.camera_rotate,
                       size: 30.0,

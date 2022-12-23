@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -46,6 +43,16 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyAir7VPozA22SY-pl5Ojeo0bky_qSdYtd8',
+    appId: '1:185498054079:web:f93824ba71cecf71da450a',
+    messagingSenderId: '185498054079',
+    projectId: 'db-insta-59421',
+    authDomain: 'db-insta-59421.firebaseapp.com',
+    storageBucket: 'db-insta-59421.appspot.com',
+    measurementId: 'G-T6S4P6MJZS',
+  );
+
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAEpOoeFbcY0bZp_MNmIz39vGpsdABEfp0',
     appId: '1:185498054079:android:8e42fe1c55c2ec0bda450a',
@@ -56,7 +63,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBc2P6gQnD0eujyTRmKfNuzikA3EpysPBk',
-    appId: '1:185498054079:ios:5e78c62b9cedbe2cda450a',
+    appId: '1:185498054079:ios:41c67473fe2bb9b6da450a',
     messagingSenderId: '185498054079',
     projectId: 'db-insta-59421',
     storageBucket: 'db-insta-59421.appspot.com',
@@ -66,7 +73,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyBc2P6gQnD0eujyTRmKfNuzikA3EpysPBk',
-    appId: '1:185498054079:ios:5e78c62b9cedbe2cda450a',
+    appId: '1:185498054079:ios:41c67473fe2bb9b6da450a',
     messagingSenderId: '185498054079',
     projectId: 'db-insta-59421',
     storageBucket: 'db-insta-59421.appspot.com',

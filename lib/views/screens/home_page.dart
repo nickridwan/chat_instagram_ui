@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:music_apps/models/message.dart';
-import 'package:music_apps/views/screens/chats.dart';
+import 'package:music_apps/views/screens/chats_page.dart';
 import 'package:music_apps/views/widgets/page_transition.dart';
 import 'package:music_apps/views/widgets/shimmer.dart';
 import '../../models/models.dart';
@@ -265,7 +265,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget chatHistory() {
+  Widget chatList() {
     return Expanded(
       child: ListView.builder(
         itemCount: !isSearch ? users.length : filterUser.length,
@@ -275,8 +275,8 @@ class _HomePageState extends State<HomePage> {
             onTap: () {
               Navigator.push(
                 context,
-                createRoute(
-                  ChatPage(
+                MaterialPageRoute(
+                  builder: (context) => ChatPage(
                     user: !isSearch ? users[index] : filterUser[index],
                   ),
                 ),
@@ -400,7 +400,7 @@ class _HomePageState extends State<HomePage> {
               ),
               circleStory(),
               option(),
-              chatHistory(),
+              chatList(),
             ],
           ),
         ),
@@ -409,8 +409,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   selectImageFromGallery() async {
-    File? file = await ImagePicker()
-        .getImage(source: ImageSource.gallery, imageQuality: 10) as File;
+    PickedFile? file = await ImagePicker()
+        .getImage(source: ImageSource.gallery, imageQuality: 10);
     if (file != null) {
       return file.path;
     } else {
@@ -420,8 +420,8 @@ class _HomePageState extends State<HomePage> {
 
   //
   selectImageFromCamera() async {
-    File? file = await ImagePicker()
-        .getImage(source: ImageSource.camera, imageQuality: 10) as File;
+    PickedFile? file = await ImagePicker()
+        .getImage(source: ImageSource.camera, imageQuality: 10);
     if (file != null) {
       return file.path;
     } else {

@@ -7,6 +7,8 @@ import '../../theme.dart';
 import 'dart:developer';
 import 'dart:io';
 
+import 'calling_page.dart';
+
 class ChatPage extends StatefulWidget {
   UserModel user;
   ChatPage({super.key, required this.user});
@@ -86,11 +88,12 @@ class _ChatPageState extends State<ChatPage> {
         IconButton(
           onPressed: () {
             log('Call');
-            // Navigator.push(
-            //     context,
-            //     createRoute(
-            //       CallingPage(user: widget.user),
-            //     ));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CallingPage(user: widget.user),
+              ),
+            );
             setState(() {});
           },
           icon: const Icon(
@@ -177,10 +180,14 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                       padding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 15),
-                      child: Text(
-                        message[index].msg,
-                        style: Style.whiteTextStyle,
-                      ),
+                      child: selectedImagePath != null
+                          ? Image.file(
+                              File(chatController.text),
+                            )
+                          : Text(
+                              message[index].msg,
+                              style: Style.whiteTextStyle,
+                            ),
                     )
                   : Container(),
             ),
@@ -241,7 +248,8 @@ class _ChatPageState extends State<ChatPage> {
                       log('Image_Path:-');
                       log(selectedImagePath);
                       if (selectedImagePath != '') {
-                        Navigator.pop(context);
+                        log('Success');
+                        chatController.text = selectedImagePath;
                         setState(() {});
                       } else {
                         log("No Image Capture");
@@ -258,10 +266,11 @@ class _ChatPageState extends State<ChatPage> {
               onPressed: () async {
                 selectedImagePath = await selectImageFromCamera();
                 log('Image_Path:-');
-                log(selectedImagePath);
+                log("Select Image : $selectedImagePath");
 
                 if (selectedImagePath != '') {
-                  Navigator.pop(context);
+                  log('Success');
+                  chatController.text = selectedImagePath;
                   setState(() {});
                 } else {
                   log("No Image Capture");
@@ -280,7 +289,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
           onChanged: (value) {
             setState(() {
-              if (chatController.text.length >= 1) {
+              if (chatController.text.isNotEmpty) {
                 isMessage = true;
               } else {
                 isMessage = false;
@@ -293,8 +302,8 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   selectImageFromGallery() async {
-    File? file = await ImagePicker()
-        .getImage(source: ImageSource.gallery, imageQuality: 10) as File;
+    PickedFile? file = await ImagePicker()
+        .getImage(source: ImageSource.gallery, imageQuality: 10);
     if (file != null) {
       return file.path;
     } else {
@@ -304,8 +313,8 @@ class _ChatPageState extends State<ChatPage> {
 
   //
   selectImageFromCamera() async {
-    File? file = await ImagePicker()
-        .getImage(source: ImageSource.camera, imageQuality: 10) as File;
+    PickedFile? file = await ImagePicker()
+        .getImage(source: ImageSource.camera, imageQuality: 10);
     if (file != null) {
       return file.path;
     } else {
