@@ -1,13 +1,13 @@
 import 'dart:io';
+import "firebase_options.dart";
 import 'package:flutter/material.dart';
 import 'package:music_apps/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:music_apps/views/screens/register_page.dart';
-import 'package:music_apps/views/screens/login_page.dart';
-import 'package:music_apps/views/screens/home_page.dart';
 import 'package:music_apps/views/widgets/splash.dart';
 import 'package:music_apps/views/widgets/camera.dart';
-import "firebase_options.dart";
+import 'package:music_apps/views/screens/home_page.dart';
+import 'package:music_apps/views/screens/login_page.dart';
+import 'package:music_apps/views/screens/register_page.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override

@@ -4,6 +4,7 @@ import 'package:dp_stopwatch/dp_stopwatch.dart';
 import 'package:dp_stopwatch/dp_stopwatch_viewmodel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:music_apps/models/models.dart';
 import 'package:music_apps/theme.dart';
 import 'dart:math' as math show sin, pi, sqrt;
@@ -22,6 +23,7 @@ class _CallingPageState extends State<CallingPage>
   AnimationController? _controller;
   String waiting = "";
   bool isAnswer = false;
+  String status = "Berdering...";
 
   @override
   void initState() {
@@ -85,12 +87,13 @@ class _CallingPageState extends State<CallingPage>
             child: IconButton(
               onPressed: () {
                 stopwatchViewModel.stop?.call();
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Panggian Berakhir"),
-                  ),
-                );
+                setState(() {
+                  isAnswer = false;
+                  status = "Panggilan Berakhir...";
+                });
+                Future.delayed(const Duration(seconds: 2), () {
+                  Navigator.pop(context);
+                });
               },
               icon: Icon(
                 CupertinoIcons.phone_arrow_up_right,
@@ -101,33 +104,50 @@ class _CallingPageState extends State<CallingPage>
           ),
         ],
       ),
-      body: Container(
-        margin: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CustomPaint(
-              painter: CirclePainter(
-                _controller!,
-                color: AppColor.kRedColor,
+      body: Center(
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CustomPaint(
+                painter: CirclePainter(
+                  _controller!,
+                  color: AppColor.kRedColor,
+                ),
+                child: SizedBox(
+                  width: 80.0 * 4.125,
+                  height: 80.0 * 4.125,
+                  child: _button(),
+                ),
               ),
-              child: SizedBox(
-                width: 80.0 * 4.125,
-                height: 80.0 * 4.125,
-                child: _button(),
-              ),
-            ),
-            !isAnswer
-                ? Text(
-                    "Berdering...",
-                    style: Style.whiteTextStyle.copyWith(fontSize: 25),
-                  )
-                : DPStopWatchWidget(
-                    stopwatchViewModel,
-                  ),
-          ],
+              !isAnswer
+                  ? Text(
+                      status,
+                      style: Style.whiteTextStyle.copyWith(fontSize: 25),
+                    )
+                  : DPStopWatchWidget(
+                      stopwatchViewModel,
+                    ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  List fake = [];
+  Widget fieldIn() {
+    return Container(
+      child: Column(
+        children: [
+          Container(
+            child: Row(
+              children: [],
+            ),
+          ),
+        ],
       ),
     );
   }

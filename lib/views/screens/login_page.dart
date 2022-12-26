@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:music_apps/theme.dart';
 import '../widgets/animation.dart';
 import 'home_page.dart';
+import 'dart:developer';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -54,6 +55,24 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   void dispose() {
     scaleController!.dispose();
     super.dispose();
+  }
+
+  @override
+  void deactivate() {
+    log("LoginPage: deactivate()");
+    super.deactivate();
+  }
+
+  @override
+  void didChangeDependencies() {
+    log("loginPage: didChangeDepedencies()");
+    super.didChangeDependencies();
+  }
+
+  @override
+  void didUpdateWidget(covariant LoginPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    log("loginPage: didUpdateWidget()");
   }
 
   Future<bool> onWillPop() async {
