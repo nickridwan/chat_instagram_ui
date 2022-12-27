@@ -46,7 +46,7 @@ class _SplashState extends State<Splash> {
                           height: 50,
                         ),
                         Text(
-                          "Insta App",
+                          "INSTA APPLICATION",
                           style: Style.whiteTextStyle.copyWith(fontSize: 20),
                         ),
                       ],

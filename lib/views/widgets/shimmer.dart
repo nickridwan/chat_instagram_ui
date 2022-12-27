@@ -6,7 +6,7 @@ shimmerListView(BuildContext context) {
   return Column(
     children: [
       Container(
-        margin: const EdgeInsets.symmetric(vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 5),
         width: MediaQuery.of(context).size.width,
         height: 70.0,
         child: Shimmer.fromColors(
