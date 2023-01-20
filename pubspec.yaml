@@ -20,10 +20,10 @@ dependencies:
   intl: ^0.18.0
   firebase_core: ^2.4.0
   stop_watch_timer: ^2.0.0
-  dp_stopwatch: ^0.0.3
   assets_audio_player: ^3.0.6
   audioplayers: ^1.1.1
   fluttertoast: ^8.1.2
+  lottie: ^2.2.0
 
 dev_dependencies:
   flutter_test:

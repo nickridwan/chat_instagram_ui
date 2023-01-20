@@ -1,17 +1,15 @@
 import 'dart:developer';
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:music_apps/models/message.dart';
 import 'package:music_apps/views/screens/chats_page.dart';
-import 'package:music_apps/views/widgets/page_transition.dart';
 import 'package:music_apps/views/widgets/shimmer.dart';
 import '../../models/models.dart';
 import '../../theme.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key? key}) : super(key: key); 
+  HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -313,8 +311,9 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                                 Text(
-                                  'membalas cerita anda',
-                                  // message[index].msg ?? '-',
+                                  message.isEmpty
+                                      ? "Membalas Cerita anda"
+                                      : message[index].msg,
                                   style: Style.whiteGreyTextStyle.copyWith(
                                     fontSize: 12,
                                     fontWeight: Weigth.regular,

@@ -9,6 +9,7 @@ import 'dart:io';
 
 import 'calling_page.dart';
 
+// ignore: must_be_immutable
 class ChatPage extends StatefulWidget {
   UserModel user;
   ChatPage({super.key, required this.user});
@@ -19,6 +20,7 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final chatController = TextEditingController();
+  final pictureController = TextEditingController();
   bool isMessage = false;
   String selectedImagePath = '';
   bool isAccount = false;
@@ -45,6 +47,27 @@ class _ChatPageState extends State<ChatPage> {
   void didUpdateWidget(covariant ChatPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     log("Chat: didUpdateWidget()");
+  }
+
+  selectImageFromGallery() async {
+    PickedFile? file = await ImagePicker()
+        .getImage(source: ImageSource.gallery, imageQuality: 10);
+    if (file != null) {
+      return file.path;
+    } else {
+      return '';
+    }
+  }
+
+  //
+  selectImageFromCamera() async {
+    PickedFile? file = await ImagePicker()
+        .getImage(source: ImageSource.camera, imageQuality: 10);
+    if (file != null) {
+      return file.path;
+    } else {
+      return '';
+    }
   }
 
   navBar() {
@@ -160,44 +183,42 @@ class _ChatPageState extends State<ChatPage> {
 
   viewMessage() {
     return Expanded(
-      child: ListView.builder(
-        itemCount: message.length,
-        itemBuilder: (context, index) {
-          log("type: ${message[index].type}");
-          return Container(
-            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 14),
-            child: Align(
-              alignment: (message[index].type != 1
-                  ? Alignment.topLeft
-                  : Alignment.topRight),
-              child: (message[index].id == widget.user.id)
-                  ? Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: (message[index].type != 1
-                            ? AppColor.kGreyColor.withOpacity(.5)
-                            : AppColor.kBlueColor),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 15),
-                      child: selectedImagePath != null
-                          ? Image.file(
-                              File(message[index].msg),
-                            )
-                          : Text(
-                              message[index].msg,
-                              style: Style.whiteTextStyle,
-                            ),
-                    )
-                  : Container(),
-            ),
-          );
-        },
-      ),
-    );
+        child: ListView.builder(
+            itemCount: message.length,
+            itemBuilder: (context, index) {
+              return Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 5, horizontal: 14),
+                child: Align(
+                  alignment: (message[index].type != 1
+                      ? Alignment.topLeft
+                      : Alignment.topRight),
+                  child: (message[index].id == widget.user.id)
+                      ? Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: (message[index].type != 1
+                                ? AppColor.kGreyColor.withOpacity(.5)
+                                : AppColor.kBlueColor),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 15),
+                          child: message[index].picture.isNotEmpty
+                              ? Image.file(
+                                  File(message[index].picture),
+                                )
+                              : Text(
+                                  message[index].msg,
+                                  style: Style.whiteTextStyle,
+                                ),
+                        )
+                      : null,
+                ),
+              );
+            }));
   }
 
-  boxMessage() {
+  formMessage() {
     return Container(
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
@@ -221,7 +242,9 @@ class _ChatPageState extends State<ChatPage> {
               borderSide: BorderSide.none,
             ),
             hintText: ' Pesan...',
-            suffixIcon: chatController.text.isNotEmpty || isMessage
+            suffixIcon: chatController.text.isNotEmpty ||
+                    pictureController.text.isNotEmpty
+                // send message
                 ? TextButton(
                     onPressed: () {
                       message.add(
@@ -230,6 +253,7 @@ class _ChatPageState extends State<ChatPage> {
                           msg: chatController.text,
                           type: 1,
                           date: DateTime.now(),
+                          picture: pictureController.text,
                         ),
                       );
                       chatController.clear();
@@ -242,6 +266,7 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                   )
+                // open galeri
                 : IconButton(
                     onPressed: () async {
                       selectedImagePath = await selectImageFromGallery();
@@ -249,7 +274,7 @@ class _ChatPageState extends State<ChatPage> {
                       log(selectedImagePath);
                       if (selectedImagePath != '') {
                         log('Success');
-                        chatController.text = selectedImagePath;
+                        pictureController.text = selectedImagePath;
                         setState(() {});
                       } else {
                         log("No Image Capture");
@@ -262,6 +287,7 @@ class _ChatPageState extends State<ChatPage> {
                       color: AppColor.kWhiteColor,
                     ),
                   ),
+            // open camera
             prefixIcon: IconButton(
               onPressed: () async {
                 selectedImagePath = await selectImageFromCamera();
@@ -270,8 +296,7 @@ class _ChatPageState extends State<ChatPage> {
 
                 if (selectedImagePath != '') {
                   log('Success');
-                  chatController.text = selectedImagePath;
-                  setState(() {});
+                  pictureController.text = selectedImagePath;
                 } else {
                   log("No Image Capture");
                 }
@@ -292,7 +317,7 @@ class _ChatPageState extends State<ChatPage> {
             setState(() {
               if (chatController.text.isNotEmpty) {
                 isMessage = true;
-              } else {
+              } else if (chatController.text.isEmpty) {
                 isMessage = false;
               }
             });
@@ -302,27 +327,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  selectImageFromGallery() async {
-    PickedFile? file = await ImagePicker()
-        .getImage(source: ImageSource.gallery, imageQuality: 10);
-    if (file != null) {
-      return file.path;
-    } else {
-      return '';
-    }
-  }
-
-  //
-  selectImageFromCamera() async {
-    PickedFile? file = await ImagePicker()
-        .getImage(source: ImageSource.camera, imageQuality: 10);
-    if (file != null) {
-      return file.path;
-    } else {
-      return '';
-    }
-  }
-
+// =================================================================================== MAIN WIDGET ===================================================================================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -337,7 +342,7 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             headerProfile(),
             viewMessage(),
-            boxMessage(),
+            formMessage(),
           ],
         ),
       ),

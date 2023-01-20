@@ -1,14 +1,13 @@
+import 'dart:async';
 import 'dart:developer';
-
-import 'package:dp_stopwatch/dp_stopwatch.dart';
-import 'package:dp_stopwatch/dp_stopwatch_viewmodel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:music_apps/models/models.dart';
 import 'package:music_apps/theme.dart';
+import 'package:music_apps/views/widgets/camera.dart';
 import 'dart:math' as math show sin, pi, sqrt;
-import 'package:flutter/animation.dart';
+
+import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class CallingPage extends StatefulWidget {
   UserModel user;
@@ -23,7 +22,51 @@ class _CallingPageState extends State<CallingPage>
   AnimationController? _controller;
   String waiting = "";
   bool isAnswer = false;
+  bool micAccess = false;
+  bool cameraAccess = false;
   String status = "Berdering...";
+  final StopWatchTimer stopWatchTimer = StopWatchTimer();
+  Stream<int>? timerStream;
+  StreamSubscription<int>? timerSubscription;
+  String hoursStr = '00';
+  String minutesStr = '00';
+  String secondsStr = '00';
+  Timer? timer;
+  StreamController<int>? streamController;
+  Duration timerInterval = const Duration(seconds: 1);
+  int counter = 0;
+
+  Stream<int> stopWatchStream() {
+    void stopTimer() {
+      if (timer != null) {
+        timer!.cancel();
+        timer = null;
+        counter = 0;
+        streamController!.close();
+      }
+    }
+
+    void tick(_) {
+      counter++;
+      streamController!.add(counter);
+      if (isAnswer == false) {
+        stopTimer();
+      }
+    }
+
+    void startTimer() {
+      timer = Timer.periodic(timerInterval, tick);
+    }
+
+    streamController = StreamController<int>(
+      onListen: startTimer,
+      onCancel: stopTimer,
+      onResume: startTimer,
+      onPause: stopTimer,
+    );
+
+    return streamController!.stream;
+  }
 
   @override
   void initState() {
@@ -43,63 +86,52 @@ class _CallingPageState extends State<CallingPage>
     log("Calling dispose()");
   }
 
-  Future waitAnswer() {
+  Future waitAnswer() async {
     setState(() {
       isAnswer = false;
     });
     return Future.delayed(const Duration(seconds: 10), () {
       setState(() {
         isAnswer = true;
+        timerStream = stopWatchStream();
+        timerSubscription = timerStream!.listen((int newTick) {
+          setState(() {
+            hoursStr =
+                ((newTick / (60 * 60)) % 60).floor().toString().padLeft(2, '0');
+            minutesStr =
+                ((newTick / 60) % 60).floor().toString().padLeft(2, '0');
+            secondsStr = (newTick % 60).floor().toString().padLeft(2, '0');
+          });
+        });
+        log("stopwatch");
       });
     });
   }
 
-  final stopwatchViewModel = DPStopwatchViewModel(
-    clockTextStyle: Style.whiteGreyTextStyle.copyWith(fontSize: 32),
-  );
-
-  Future AudioPlayer() async {}
-
   @override
   Widget build(BuildContext context) {
-    log("jawab $isAnswer");
+    log(isAnswer == false
+        ? "panggilan sedang tidak berlangsung"
+        : "panggilan sedang berlangsung");
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          onPressed: () {
-            stopwatchViewModel.start?.call();
-          },
+          onPressed: () {},
           icon: Icon(
-            CupertinoIcons.chevron_down,
+            Icons.person_add_rounded,
             size: 30.0,
             color: AppColor.kWhiteColor,
           ),
         ),
         actions: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            decoration: BoxDecoration(
-              color: AppColor.kRedColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: IconButton(
-              onPressed: () {
-                stopwatchViewModel.stop?.call();
-                setState(() {
-                  isAnswer = false;
-                  status = "Panggilan Berakhir...";
-                });
-                Future.delayed(const Duration(seconds: 2), () {
-                  Navigator.pop(context);
-                });
-              },
-              icon: Icon(
-                CupertinoIcons.phone_arrow_up_right,
-                size: 24.0,
-                color: AppColor.kWhiteColor,
-              ),
+          IconButton(
+            onPressed: () {},
+            icon: Icon(
+              CupertinoIcons.arrow_2_circlepath,
+              size: 30.0,
+              color: AppColor.kWhiteColor,
             ),
           ),
         ],
@@ -119,7 +151,7 @@ class _CallingPageState extends State<CallingPage>
                 child: SizedBox(
                   width: 80.0 * 4.125,
                   height: 80.0 * 4.125,
-                  child: _button(),
+                  child: wave(),
                 ),
               ),
               !isAnswer
@@ -127,9 +159,82 @@ class _CallingPageState extends State<CallingPage>
                       status,
                       style: Style.whiteTextStyle.copyWith(fontSize: 25),
                     )
-                  : DPStopWatchWidget(
-                      stopwatchViewModel,
+                  : Text(
+                      "$hoursStr:$minutesStr:$secondsStr",
+                      style: Style.whiteTextStyle.copyWith(fontSize: 30),
                     ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 50),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColor.kRedColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          cameraAccess = !cameraAccess;
+                        });
+                      },
+                      icon: Icon(
+                        CupertinoIcons.videocam_fill,
+                        size: 30.0,
+                        color: cameraAccess
+                            ? AppColor.kWhiteColor
+                            : AppColor.kGreyColor,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top: 50),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColor.kRedColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isAnswer = false;
+                          status = "Panggilan Berakhir...";
+                        });
+                        Future.delayed(const Duration(seconds: 2), () {
+                          Navigator.pop(context);
+                        });
+                      },
+                      icon: Icon(
+                        CupertinoIcons.phone_arrow_up_right,
+                        size: 24.0,
+                        color: AppColor.kWhiteColor,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top: 50),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColor.kRedColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          micAccess = !micAccess;
+                        });
+                      },
+                      icon: Icon(
+                        micAccess ? CupertinoIcons.mic_off : CupertinoIcons.mic,
+                        size: 24.0,
+                        color: AppColor.kWhiteColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -138,21 +243,8 @@ class _CallingPageState extends State<CallingPage>
   }
 
   List fake = [];
-  Widget fieldIn() {
-    return Container(
-      child: Column(
-        children: [
-          Container(
-            child: Row(
-              children: [],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _button() {
+  Widget wave() {
     return Center(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(80.0),

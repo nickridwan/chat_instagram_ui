@@ -1,8 +1,6 @@
 import 'dart:io';
-import "firebase_options.dart";
 import 'package:flutter/material.dart';
 import 'package:music_apps/theme.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:music_apps/views/widgets/splash.dart';
 import 'package:music_apps/views/widgets/camera.dart';
 import 'package:music_apps/views/screens/home_page.dart';
@@ -38,7 +36,7 @@ class InstaApp extends StatelessWidget {
         '/': (context) => Splash(),
         '/login': (context) => const LoginPage(),
         '/register': (context) => Registerpage(),
-        'home': (context) => HomePage(),
+        '/home': (context) => HomePage(),
         '/camera': (context) => const CameraAccess(),
       },
     );

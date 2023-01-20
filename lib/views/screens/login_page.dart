@@ -147,6 +147,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         TextField(
           style: Style.whiteGreyTextStyle,
           controller: emailCtr,
+          textInputAction: TextInputAction.next,
           keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
             filled: true,
@@ -161,18 +162,19 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               borderRadius: BorderRadius.circular(20.0),
             ),
           ),
-          onChanged: (value) {
-            dummyFilter = dummyUser
-                .where((element) => element.username.contains(emailCtr.text))
-                .toList();
-            setState(() {});
-          },
+          // onChanged: (value) {
+          //   dummyFilter = dummyUser
+          //       .where((element) => element.username.contains(emailCtr.text))
+          //       .toList();
+          //   setState(() {});
+          // },
         ),
         const SizedBox(
           height: 20.0,
         ),
         TextField(
           style: Style.whiteGreyTextStyle,
+          textInputAction: TextInputAction.done,
           obscureText: isSecure ? false : true,
           controller: pwCtr,
           decoration: InputDecoration(
@@ -195,11 +197,33 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               borderRadius: BorderRadius.circular(20.0),
             ),
           ),
-          onChanged: (value) {
-            dummyFilter = dummyUser
-                .where((element) => element.password.contains(pwCtr.text))
-                .toList();
-            setState(() {});
+          // onChanged: (value) {
+          //   dummyFilter = dummyUser
+          //       .where((element) => element.password.contains(pwCtr.text))
+          //       .toList();
+          //   setState(() {});
+          // },
+          onSubmitted: (value) {
+            if (emailCtr.text.isEmpty || pwCtr.text.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    "Please input this field",
+                    style: Style.whiteTextStyle,
+                  ),
+                ),
+              );
+            } else if (emailCtr.text == email && pwCtr.text == password) {
+              scaleController!.forward();
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: AppColor.kRedColor,
+                content: Text(
+                  "System Error",
+                  style: Style.whiteTextStyle,
+                ),
+              ));
+            }
           },
         ),
       ],
@@ -289,6 +313,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    log(' ini status login kontol : $isLoading');
     return Scaffold(
       body: WillPopScope(
         onWillPop: onWillPop,
