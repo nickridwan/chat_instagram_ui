@@ -103,7 +103,6 @@ class _CallingPageState extends State<CallingPage>
             secondsStr = (newTick % 60).floor().toString().padLeft(2, '0');
           });
         });
-        log("stopwatch");
       });
     });
   }
@@ -113,7 +112,6 @@ class _CallingPageState extends State<CallingPage>
     log(isAnswer == false
         ? "panggilan sedang tidak berlangsung"
         : "panggilan sedang berlangsung");
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,

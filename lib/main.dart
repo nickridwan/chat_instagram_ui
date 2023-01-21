@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:music_apps/theme.dart';
 import 'package:music_apps/views/widgets/splash.dart';
 import 'package:music_apps/views/widgets/camera.dart';
@@ -18,6 +19,10 @@ class MyHttpOverrides extends HttpOverrides {
 
 Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides();
+  SystemChrome.setPreferredOrientations(
+    [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown],
+  );
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   runApp(
     const InstaApp(),
   );

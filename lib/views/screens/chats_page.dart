@@ -203,7 +203,8 @@ class _ChatPageState extends State<ChatPage> {
                           ),
                           padding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 15),
-                          child: message[index].picture.isNotEmpty
+                          child: message[index].picture.isNotEmpty &&
+                                  message[index].msg.isEmpty
                               ? Image.file(
                                   File(message[index].picture),
                                 )
